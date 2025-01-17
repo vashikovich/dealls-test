@@ -24,7 +24,7 @@ export default (): Config => {
     jwt: {
       accessSecret: process.env.JWT_ACCESS_SECRET || 'secret',
       refreshSecret: process.env.JWT_REFRESH_SECRET || 'secret',
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+      expiresIn: process.env.JWT_EXPIRES_IN || '15m',
       refreshIn: process.env.JWT_REFRESH_IN || '30d',
       bcryptSaltOrRound: 10,
     },

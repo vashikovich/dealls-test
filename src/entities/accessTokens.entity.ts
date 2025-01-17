@@ -19,19 +19,19 @@ export class AccessToken {
 
   @Index()
   @Column({ nullable: false, type: 'varchar' })
-  refresh_token: string;
+  refreshToken: string;
 
   @Column({ nullable: false, type: 'integer' })
-  resource_owner_id: number;
+  resourceOwnerId: number;
 
   @Column({ nullable: false, type: 'varchar' })
-  resource_owner_type: string;
+  resourceOwnerType: string;
 
   @Column({ nullable: true, type: 'timestamp' })
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @Column({ nullable: true, type: 'timestamp' })
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 }
