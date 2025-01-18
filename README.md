@@ -1,73 +1,125 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Backend System for Dating App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Service Structure
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This repository contains the backend system for a dating mobile app similar to Tinder or Bumble. The primary functionalities include:
 
-## Description
+1. **User Authentication**: Sign-up, login, and token-based authentication.
+2. **Swiping Logic**: Users can swipe left (pass) or swipe right (like) on profiles.
+3. **Profile Management**: Users can create and update their profiles.
+4. **Premium Features**: Users can unlock premium features by subscribing to packages.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Main Components
 
-## Installation
+- **Controllers**: Handle incoming HTTP requests and map them to service methods.
+- **Services**: Business logic is implemented here.
+- **Entities**: Database models for users, profiles, swipes, and subscriptions.
+- **DTOs (Data Transfer Objects)**: Define the structure of data sent to and from the API.
+- **Guards**: Used to protect endpoints, such as authentication guards.
 
-```bash
-$ npm install
-```
+### API Endpoints
 
-## Running the app
+1. **AuthController**
 
-```bash
-# development
-$ npm run start
+- **POST /auth/signup**
+  Signs up a new user by accepting user email and password and creates an account.
 
-# watch mode
-$ npm run start:dev
+- **POST /auth/login**
+  Logs in a user by validating email and password, and returns an authentication token (JWT).
 
-# production mode
-$ npm run start:prod
-```
+- **POST /auth/refresh**
+  Refreshes an expired authentication token using a valid refresh token.
 
-## Test
+  2. **MatcherController**
 
-```bash
-# unit tests
-$ npm run test
+- **PUT /matcher/profile**
+  Allows the user to update their profile details (e.g., name, birth date, gender, bio).
 
-# e2e tests
-$ npm run test:e2e
+- **GET /matcher/candidates**
+  Retrieves a list of candidates for the user to swipe on, with params to exclude users already queued on the UI so that it won't conflict with previously retrieved ones.
 
-# test coverage
-$ npm run test:cov
-```
+- **GET /matcher/remaining-quota**
+  Checks the remaining swipe quota for the current user.
 
-## Support
+- **POST /matcher/swipe**
+  Allows the user to swipe on a candidate (like or dislike).
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Tech Stack
 
-## Stay in touch
+- **Node.js**: The runtime environment for the application.
+- **NestJS**: A framework for building efficient, scalable Node.js applications.
+- **TypeORM**: ORM to interact with the database (PostgreSQL).
+- **JWT**: For token-based authentication.
+- **Class-Validator**: For validating input data.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## How to Run the Service
 
-## License
+### Prerequisites
 
-Nest is [MIT licensed](LICENSE).
+Make sure you have the following installed:
+
+- Node.js (v14 or later)
+- PostgreSQL
+
+### Setup Instructions
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/vashikovich/dealls-test
+   cd dealls-test
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Setup environment variables**
+   Copy the `.env.example` file to `.env` and update the values:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Or you can just use default values
+
+4. **Prepare the database**
+   Create database and apply migrations:
+
+   ```bash
+   npm run db:create
+   npm run db:run
+   ```
+
+5. **Run the application**
+
+   ```bash
+   npm run start
+   ```
+
+   The app will start on port 3000 by default.
+
+6. **Testing**
+   For integration tests, run:
+   ```bash
+   npm run test
+   ```
+   P.S. There are 2 integration tests, but they can't run in parallel yet..
+
+## [Bonus] Additional Enhancements
+
+- **Linting**: ESLint and Prettier are set up to ensure code quality and consistency. You can run:
+  ```bash
+  npm run lint
+  npm run format
+  ```
+
+## Test Cases
+
+Please refer to the list of comprehensive test cases provided in the documentation or the test suite files for a detailed breakdown of tests covering authentication, swiping, profile management, and more.
+
+---
+
+For any additional information or issues, please feel free to open an issue or contribute to the repository.

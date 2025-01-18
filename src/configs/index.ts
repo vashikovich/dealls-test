@@ -29,22 +29,6 @@ export default (): Config => {
       refreshIn: process.env.JWT_REFRESH_IN || '30d',
       bcryptSaltOrRound: 10,
     },
-    authentication: {
-      sendConfirmationEmail:
-        Boolean(process.env.AUTH_SEND_CONFIRMATION_EMAIL) || false,
-      confirmationUrl:
-        process.env.AUTH_CONFIRMATION_URL || 'http://localhost:3000/confirm',
-      confirmationIn: +process.env.AUTH_CONFIRMATION_IN || 24,
-      resetPasswordUrl:
-        process.env.AUTH_RESET_PASSWORD_URL ||
-        'http://localhost:3000/reset-password',
-      resetPasswordIn: +process.env.AUTH_RESET_PASSWORD_IN || 1,
-      maximumAttempts: 10,
-    },
-    basicAuth: {
-      username: process.env.BASIC_AUTH_USERNAME || 'admin',
-      password: process.env.BASIC_AUTH_PASSWORD || 'admin',
-    },
   };
 };
 
