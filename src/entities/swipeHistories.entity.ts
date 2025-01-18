@@ -19,9 +19,15 @@ export class SwipeHistory {
   @Column({ type: 'date' })
   swipeDate: string;
 
+  @Column({ type: 'string' })
+  userId: string;
+
   @ManyToOne(() => User, (user) => user.swipes)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @Column({ type: 'string' })
+  targetUserId: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'target_user_id' })

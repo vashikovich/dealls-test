@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from './users.entity';
 
@@ -12,6 +13,10 @@ import { User } from './users.entity';
 export class Subscription {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  @Index()
+  userId: string;
 
   @ManyToOne(() => User, (user) => user.subscriptions)
   @JoinColumn({ name: 'user_id' })

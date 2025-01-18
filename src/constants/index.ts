@@ -13,3 +13,6 @@ export enum AUTH_STRATEGY {
   TOKEN = 'token',
   REFRESH_TOKEN = 'refresh_token',
 }
+
+export const DEFAULT_SWIPE_QUOTA = 10;
+export const DEFAULT_CANDIDATE_AMOUNT = 10;

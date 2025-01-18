@@ -38,6 +38,10 @@ describe('AuthController (Integration)', () => {
     );
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   describe('signup', () => {
     it('should create a new user and return tokens', async () => {
       const signupDto: SignupDto = {
