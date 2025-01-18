@@ -11,7 +11,7 @@ export default (): Config => {
       port: +process.env.APP_PORT || 3000,
     },
     database: {
-      type: 'postgres',
+      type: process.env.DATABASE_TYPE || 'postgres',
       database:
         process.env.NODE_ENV === 'test'
           ? `${process.env.DATABASE_NAME}_test`

@@ -91,7 +91,18 @@ export class AuthService {
     return newTokens;
   }
 
-  async saveRefreshToken(
+  async revokeRefreshToken(refreshToken: string): Promise<void> {
+    const tokenHash = await this.hashData(refreshToken);
+    const entity = await this.refreshTokenRepository.findOne({
+      where: { tokenHash },
+    });
+    if (!entity) throw new UnauthorizedException('Invalid token.');
+
+    entity.revoked = true;
+    await this.refreshTokenRepository.save(entity);
+  }
+
+  private async saveRefreshToken(
     refreshToken: string,
     userId: string,
   ): Promise<RefreshToken> {
@@ -124,17 +135,6 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  async revokeRefreshToken(refreshToken: string): Promise<void> {
-    const tokenHash = await this.hashData(refreshToken);
-    const entity = await this.refreshTokenRepository.findOne({
-      where: { tokenHash },
-    });
-    if (!entity) throw new UnauthorizedException('Invalid token.');
-
-    entity.revoked = true;
-    await this.refreshTokenRepository.save(entity);
   }
 
   private async hashData(data: string): Promise<string> {
