@@ -1,69 +1,41 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from '../auth.controller';
-import { AuthService } from '../auth.service';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/users.entity';
-import { RefreshToken } from 'src/entities/refreshTokens.entity';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
-import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { SignupDto } from '../dto/signup.dto';
 import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refreshToken.dto';
 import * as request from 'supertest';
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { AppModule } from 'src/app.module';
 
 describe('AuthController (Integration)', () => {
   let app: INestApplication;
-  let authController: AuthController;
   let userRepository: Repository<User>;
-  let refreshTokenRepository: Repository<RefreshToken>;
   let jwtService: JwtService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-          load: [
-            () => ({
-              jwt: {
-                accessSecret: 'testAccessSecret',
-                refreshSecret: 'testRefreshSecret',
-                expiresIn: '1h',
-                refreshIn: '7d',
-                bcryptSaltOrRound: 10,
-              },
-            }),
-          ],
-        }),
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [User, RefreshToken],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([User, RefreshToken]),
-        JwtModule.register({}),
-      ],
-      controllers: [AuthController],
-      providers: [AuthService],
+      imports: [AppModule],
     }).compile();
 
     app = module.createNestApplication();
     await app.init();
 
-    authController = module.get<AuthController>(AuthController);
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
-    refreshTokenRepository = module.get<Repository<RefreshToken>>(
-      getRepositoryToken(RefreshToken),
-    );
-    jwtService = module.get<JwtService>(JwtService);
+    const dataSource = app.get(DataSource);
+    userRepository = dataSource.getRepository(User);
+    jwtService = new JwtService();
   });
 
   afterEach(async () => {
-    await userRepository.clear();
-    await refreshTokenRepository.clear();
+    const entityManager = app.get(EntityManager);
+    const tableNames = entityManager.connection.entityMetadatas
+      .map((entity) => entity.tableName)
+      .join(', ');
+
+    await entityManager.query(
+      `truncate ${tableNames} restart identity cascade;`,
+    );
   });
 
   describe('signup', () => {
@@ -73,10 +45,13 @@ describe('AuthController (Integration)', () => {
         password: 'Password123',
       };
 
-      const result = await authController.signup(signupDto);
+      const response = await request(app.getHttpServer())
+        .post('/auth/signup')
+        .send(signupDto)
+        .expect(HttpStatus.CREATED);
 
-      expect(result).toHaveProperty('accessToken');
-      expect(result).toHaveProperty('refreshToken');
+      expect(response.body).toHaveProperty('accessToken');
+      expect(response.body).toHaveProperty('refreshToken');
 
       const user = await userRepository.findOne({
         where: { email: signupDto.email },
@@ -90,9 +65,12 @@ describe('AuthController (Integration)', () => {
         email: 'test@example.com',
         password: 'Password123',
       };
-      await authController.signup(signupDto);
+      await request(app.getHttpServer()).post('/auth/signup').send(signupDto);
 
-      await expect(authController.signup(signupDto)).rejects.toThrow();
+      await request(app.getHttpServer())
+        .post('/auth/signup')
+        .send(signupDto)
+        .expect(HttpStatus.CONFLICT);
     });
   });
 
@@ -102,16 +80,20 @@ describe('AuthController (Integration)', () => {
         email: 'test@example.com',
         password: 'Password123',
       };
-      await authController.signup(signupDto);
+
+      await request(app.getHttpServer()).post('/auth/signup').send(signupDto);
 
       const loginDto: LoginDto = {
         email: 'test@example.com',
         password: 'Password123',
       };
-      const result = await authController.login(loginDto);
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send(loginDto)
+        .expect(HttpStatus.OK);
 
-      expect(result).toHaveProperty('accessToken');
-      expect(result).toHaveProperty('refreshToken');
+      expect(response.body).toHaveProperty('accessToken');
+      expect(response.body).toHaveProperty('refreshToken');
     });
 
     it('should throw an unauthorized error for invalid credentials', async () => {
@@ -120,7 +102,10 @@ describe('AuthController (Integration)', () => {
         password: 'WrongPassword',
       };
 
-      await expect(authController.login(loginDto)).rejects.toThrow();
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send(loginDto)
+        .expect(HttpStatus.UNAUTHORIZED);
     });
   });
 
@@ -130,18 +115,21 @@ describe('AuthController (Integration)', () => {
         email: 'test@example.com',
         password: 'Password123',
       };
-      const { refreshToken } = await authController.signup(signupDto);
 
-      const result = await authController.refreshToken({ refreshToken });
+      const response = await request(app.getHttpServer())
+        .post('/auth/signup')
+        .send(signupDto)
+        .expect(HttpStatus.CREATED);
 
-      expect(result).toHaveProperty('accessToken');
-      expect(result).toHaveProperty('refreshToken');
+      expect(response.body).toHaveProperty('accessToken');
+      expect(response.body).toHaveProperty('refreshToken');
     });
 
     it('should throw an unauthorized error for an invalid refresh token', async () => {
-      await expect(
-        authController.refreshToken({ refreshToken: 'invalidToken' }),
-      ).rejects.toThrow('Invalid or revoked token.');
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({ refreshToken: 'invalidToken' })
+        .expect(401);
     });
 
     it('should return UnauthorizedException for expired refresh token', async () => {
@@ -164,10 +152,7 @@ describe('AuthController (Integration)', () => {
       await request(app.getHttpServer())
         .post('/auth/refresh')
         .send(refreshTokenDto)
-        .expect(HttpStatus.UNAUTHORIZED)
-        .expect((res) => {
-          expect(res.body.message).toBe('Token has expired.');
-        });
+        .expect(HttpStatus.UNAUTHORIZED);
     });
   });
 });

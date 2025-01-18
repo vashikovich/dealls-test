@@ -6,12 +6,11 @@ import {
   UpdateDateColumn,
   OneToMany,
   OneToOne,
-  Index,
 } from 'typeorm';
 import { UserPreferences } from './userPreferences.entity';
 import { SwipeHistory } from './swipeHistories.entity';
 import { Subscription } from './subscriptions.entity';
-import { Gender } from 'src/enums/gender.enum';
+import { UserProfile } from './userProfiles.entity';
 
 @Entity('users')
 export class User {
@@ -24,18 +23,8 @@ export class User {
   @Column()
   passwordHash: string;
 
-  @Column()
-  name: string;
-
-  @Column({ type: 'date' })
-  birthDate: string;
-
-  @Column({ nullable: true })
-  bio: string;
-
-  @Column({ type: 'enum', enum: Gender })
-  @Index()
-  gender: Gender;
+  @OneToOne(() => UserProfile, (profile) => profile.user)
+  profile: UserPreferences;
 
   @OneToOne(() => UserPreferences, (preferences) => preferences.user)
   preferences: UserPreferences;

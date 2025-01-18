@@ -20,6 +20,8 @@ export interface DatabaseConfig {
   username: string;
   password: string;
   port: number;
+  synchronize: boolean;
+  dropSchema: boolean;
 }
 
 export interface JWTConfig {

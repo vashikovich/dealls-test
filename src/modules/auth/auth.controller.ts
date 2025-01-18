@@ -9,7 +9,7 @@ import {
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenGuard } from 'src/guards/refresh-token.guard';
+import { RefreshTokenGuard } from 'src/guards/refreshToken.guard';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 
 @Controller('auth')

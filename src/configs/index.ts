@@ -13,13 +13,14 @@ export default (): Config => {
     database: {
       type: process.env.DATABASE_TYPE || 'postgres',
       database:
-        process.env.NODE_ENV === 'test'
-          ? `${process.env.DATABASE_NAME}_test`
-          : process.env.DATABASE_NAME || 'example',
+        (process.env.DATABASE_NAME || 'example') +
+        (process.env.NODE_ENV === 'test' ? '_test' : ''),
       host: process.env.DATABASE_HOST || 'localhost',
       username: process.env.DATABASE_USERNAME || 'postgres',
       password: process.env.DATABASE_PASSWORD || 'postgres',
       port: +process.env.DATABASE_PORT || 5432,
+      synchronize: process.env.NODE_ENV === 'test' ? true : false,
+      dropSchema: process.env.NODE_ENV === 'test' ? true : false,
     },
     jwt: {
       accessSecret: process.env.JWT_ACCESS_SECRET || 'secret',

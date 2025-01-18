@@ -18,14 +18,15 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli -d ./src/database/data-source.ts",
     "db:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.cjs db:create -d ./src/database/data-source.ts",
-    "db:drop": "npx typeorm schema:drop",
-    "db:generate": "npx typeorm migration:generate src/database/migrations/migrations",
-    "db:run": "npx typeorm migration:run",
-    "db:rollback": "npx typeorm migration:revert",
-    "db:create:run": "npx db:create && yarn db:run",
+    "db:drop": "yarn typeorm schema:drop",
+    "db:generate": "yarn typeorm migration:generate src/database/migrations/migrations",
+    "db:run": "yarn typeorm migration:run",
+    "db:rollback": "yarn typeorm migration:revert",
+    "db:create:run": "yarn db:create && yarn db:run",
     "db:seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d ./src/database/data-source.ts",
-    "db:init": "npx db:create && yarn db:generate && yarn db:run"
+    "db:init": "yarn db:create && yarn db:generate && yarn db:run"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -65,7 +66,6 @@
     "pg": "^8.13.1",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",
-    "sqlite3": "^5.1.7",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
@@ -92,7 +92,7 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "./coverage",
+    "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
 }
