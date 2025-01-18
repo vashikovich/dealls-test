@@ -1,7 +1,6 @@
 import {
   Entity,
   Column,
-  CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
@@ -27,9 +26,6 @@ export class UserPreferences {
   @OneToOne(() => User, (user) => user.preferences)
   @JoinColumn({ name: 'id' })
   user: User;
-
-  @CreateDateColumn()
-  createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;

@@ -8,6 +8,7 @@ import { UserProfile } from 'src/entities/userProfiles.entity';
 import { today } from 'src/utils';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
+import { User } from 'src/entities/users.entity';
 
 @Injectable()
 export class MatcherService {
@@ -48,6 +49,12 @@ export class MatcherService {
 
     const query = this.profileRepository
       .createQueryBuilder('profile')
+      .leftJoin(User, 'user')
+      .leftJoinAndSelect(
+        Subscription,
+        'subscription',
+        'user.id = subscription.user_id AND subscription.start_date <= NOW() AND subscription.end_date >= NOW()',
+      )
       .where('profile.id != :userId', { userId });
 
     if (prefs.gender)

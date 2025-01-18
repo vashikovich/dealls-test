@@ -1,11 +1,13 @@
 import { Gender } from 'src/enums/gender.enum';
 import {
+  AfterLoad,
   Column,
   Entity,
   Index,
   JoinColumn,
   OneToOne,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './users.entity';
 
@@ -26,7 +28,18 @@ export class UserProfile {
   @Index()
   gender: Gender;
 
+  // Virtual column
+  isVerified: boolean;
+
   @OneToOne(() => User, (user) => user.preferences)
   @JoinColumn({ name: 'id' })
   user: User;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @AfterLoad()
+  afterLoad() {
+    this.isVerified = this.user?.subscriptions?.[0]?.hasVerifiedTag || false;
+  }
 }

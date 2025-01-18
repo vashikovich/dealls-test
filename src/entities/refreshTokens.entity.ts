@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   Index,
@@ -33,7 +32,4 @@ export class RefreshToken {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
