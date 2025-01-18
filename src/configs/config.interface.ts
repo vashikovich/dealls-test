@@ -4,8 +4,6 @@ export interface Config {
   app: AppConfig;
   database: DatabaseConfig;
   jwt: JWTConfig;
-  basicAuth: BasicAuthConfig;
-  authentication: AuthenticationConfig;
 }
 
 export interface AppConfig {
@@ -30,22 +28,4 @@ export interface JWTConfig {
   expiresIn: string;
   refreshIn: string;
   bcryptSaltOrRound: string | number;
-}
-
-export interface BasicAuthConfig {
-  username: string;
-  password: string;
-}
-
-export interface AuthenticationConfig {
-  sendConfirmationEmail: boolean;
-  confirmationUrl: string;
-  confirmationIn: number;
-  resetPasswordUrl: string;
-  resetPasswordIn: number;
-  passwordPattern?: string | RegExp;
-  maximumAttempts?: number;
-  unlockIn?: string;
-  unlockStrategy?: string;
-  unlockAccessUrl?: string;
 }
