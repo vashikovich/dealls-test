@@ -24,9 +24,6 @@ export class User {
   @Column()
   passwordHash: string;
 
-  // Virtual Column
-  password: string;
-
   @Column()
   name: string;
 

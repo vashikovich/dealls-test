@@ -1,15 +1,6 @@
-import { AUTH_STRATEGY, OAUTH_GRANT_TYPE } from 'src/constants';
-import { ExecutionContext } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { AUTH_STRATEGY } from 'src/constants';
+import { AuthGuard as NestAuthGuard } from '@nestjs/passport';
 
-export class RefreshTokenGuard extends AuthGuard(AUTH_STRATEGY.REFRESH_TOKEN) {
-  canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest();
-
-    if (request?.body?.grantType === OAUTH_GRANT_TYPE.PASSWORD) {
-      return true;
-    }
-
-    return super.canActivate(context);
-  }
-}
+export class RefreshTokenGuard extends NestAuthGuard(
+  AUTH_STRATEGY.REFRESH_TOKEN,
+) {}

@@ -4,21 +4,25 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 import { JwtPayload } from 'src/modules/auth/interfaces';
 import { AUTH_STRATEGY } from 'src/constants';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
   AUTH_STRATEGY.TOKEN,
 ) {
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    private readonly authService: AuthService,
+    configService: ConfigService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_SECRET || 'super-secret', // Use environment variable in production
-      passReqToCallback: true, // Pass the request to the callback function
+      secretOrKey: configService.get('jwt.accessSecret'),
+      passReqToCallback: true,
     });
   }
 
   async validate(payload: JwtPayload) {
-    return this.authService.validateUser(payload);
+    return payload;
   }
 }
